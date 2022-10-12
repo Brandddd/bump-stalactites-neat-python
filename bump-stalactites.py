@@ -1,9 +1,5 @@
 """
-    * Bump Stalatites
-    ! Conclusiones:
-        ? - Con una población de 6 individuos, logran esquivar los tubos, pero muy lento.
-        ? - Con una población de 8 individuos, 
-        ? - Con una pobalción de 10 individuos, 
+    * Bump Stalatites con Neat, (Redes neuronales)
 """
 
 # * Declaración de librerías
@@ -150,7 +146,7 @@ class Pipe():
             * Mueve la Estalactita en función de la velocidad. 
             TODO : Incluir nivel de mas velocidad acorde a la puntuación.
         """
-        self.x -= self.VEL
+        self.x -= self.VEL * 1.5
 
     def draw(self, win):
         """
@@ -305,7 +301,6 @@ def eval_genomes(genomes, config):
                 run = False
                 pygame.quit()
                 quit()
-                break
 
         pipe_ind = 0
         if len(birds) > 0:
@@ -367,7 +362,7 @@ def eval_genomes(genomes, config):
         draw_window(WIN, birds, pipes, base, score, gen, pipe_ind)
 
         # break if score gets large enough
-        if score > 10:
+        if score > 200:
             print(" Felicidades, ha aprendido satisfactoriamente. ")
             break
 
