@@ -154,20 +154,16 @@ class Pipe():
 
     def draw(self, win):
         """
-        draw both the top and bottom of the pipe
-        :param win: pygame window/surface
-        :return: None
+            * Dibuja la parte de arriba y de abajo de la Estalactita
         """
-        # draw top
+        # Dibuja pipa de arriba.
         win.blit(self.PIPE_TOP, (self.x, self.top))
-        # draw bottom
+        # Dibuja pipa de abajo.
         win.blit(self.PIPE_BOTTOM, (self.x, self.bottom))
 
     def collide(self, bird, win):
         """
-        returns if a point is colliding with the pipe
-        :param bird: Bird object
-        :return: Bool
+            * Función de colisión.
         """
         bird_mask = bird.get_mask()
         top_mask = pygame.mask.from_surface(self.PIPE_TOP)
@@ -186,7 +182,7 @@ class Pipe():
 
 class Base:
     """
-    Represnts the moving floor of the game
+        * Representa el movimiento de la base de abajo (Especie de superficie marciana)
     """
     VEL = 5
     WIDTH = base_img.get_width()
@@ -194,9 +190,7 @@ class Base:
 
     def __init__(self, y):
         """
-        Initialize the object
-        :param y: int
-        :return: None
+            * Inicialización del objeto. 
         """
         self.y = y
         self.x1 = 0
@@ -204,8 +198,7 @@ class Base:
 
     def move(self):
         """
-        move floor so it looks like its scrolling
-        :return: None
+            * Movimiento del piso.
         """
         self.x1 -= self.VEL
         self.x2 -= self.VEL
@@ -217,9 +210,7 @@ class Base:
 
     def draw(self, win):
         """
-        Draw the floor. This is two images that move together.
-        :param win: the pygame surface/window
-        :return: None
+            * Dibujando la Hitbox de la superficie.
         """
         win.blit(self.IMG, (self.x1, self.y))
         win.blit(self.IMG, (self.x2, self.y))
@@ -227,12 +218,7 @@ class Base:
 
 def blitRotateCenter(surf, image, topleft, angle):
     """
-    Rotate a surface and blit it to the window
-    :param surf: the surface to blit to
-    :param image: the image surface to rotate
-    :param topLeft: the top left position of the image
-    :param angle: a float value for angle
-    :return: None
+        * Organización de la superficie con respecto a la pantalla. 
     """
     rotated_image = pygame.transform.rotate(image, angle)
     new_rect = rotated_image.get_rect(
@@ -243,14 +229,7 @@ def blitRotateCenter(surf, image, topleft, angle):
 
 def draw_window(win, birds, pipes, base, score, gen, pipe_ind):
     """
-    draws the windows for the main game loop
-    :param win: pygame window surface
-    :param bird: a Bird object
-    :param pipes: List of pipes
-    :param score: score of the game (int)
-    :param gen: current generation
-    :param pipe_ind: index of closest pipe
-    :return: None
+        * Dibujando la pantalla para el la ventana principal main_game loop
     """
     if gen == 0:
         gen = 1
@@ -261,7 +240,7 @@ def draw_window(win, birds, pipes, base, score, gen, pipe_ind):
 
     base.draw(win)
     for bird in birds:
-        # draw lines from bird to pipe
+        # ? 
         if DRAW_LINES:
             try:
                 pygame.draw.line(win, (255, 0, 0), (bird.x+bird.img.get_width()/2, bird.y + bird.img.get_height(
@@ -270,30 +249,29 @@ def draw_window(win, birds, pipes, base, score, gen, pipe_ind):
                 )/2), (pipes[pipe_ind].x + pipes[pipe_ind].PIPE_BOTTOM.get_width()/2, pipes[pipe_ind].bottom), 5)
             except:
                 pass
-        # draw bird
+        # * Dibuja la hb de la nave en pantalla. 
         bird.draw(win)
 
-    # score
-    score_label = STAT_FONT.render("Score: " + str(score), 1, (255, 255, 255))
-    win.blit(score_label, (WIN_WIDTH - score_label.get_width() - 15, 10))
-
-    # generations
-    score_label = STAT_FONT.render("Gens: " + str(gen-1), 1, (255, 255, 255))
+    # * Texto generaciones
+    score_label = STAT_FONT.render("Generación: " + str(gen), 1, (0, 0, 0))
     win.blit(score_label, (10, 10))
 
-    # alive
+    # * Texto de los que aun quedan vivos. 
     score_label = STAT_FONT.render(
-        "Alive: " + str(len(birds)), 1, (255, 255, 255))
+        "Sobrevivientes: " + str(len(birds)), 1, (0, 0, 0))
     win.blit(score_label, (10, 50))
+
+    # * Puntuación 
+    score_label = STAT_FONT.render("Puntaje: " + str(score), 1, (0, 0, 0))
+    win.blit(score_label, (10, 90))
 
     pygame.display.update()
 
 
 def eval_genomes(genomes, config):
     """
-    runs the simulation of the current population of
-    birds and sets their fitness based on the distance they
-    reach in the game.
+        * Ejecuta la simulacion de la población de naves y establece
+        * su Fitness basado en la distancia que ellos alcanzan dentro del juego.
     """
     global WIN, gen
     win = WIN
@@ -389,9 +367,9 @@ def eval_genomes(genomes, config):
         draw_window(WIN, birds, pipes, base, score, gen, pipe_ind)
 
         # break if score gets large enough
-        '''if score > 20:
-            pickle.dump(nets[0],open("best.pickle", "wb"))
-            break'''
+        if score > 10:
+            print(" Felicidades, ha aprendido satisfactoriamente. ")
+            break
 
 
 def run(config_file):
