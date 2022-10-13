@@ -349,7 +349,7 @@ def eval_genomes(genomes, config):
             score += 1
             # Esta linea dará más y más recompensa al pasar mediante los obstaculos.
             for genome in ge:
-                genome.fitness += 2
+                genome.fitness += 4
             pipes.append(Pipe(WIN_WIDTH))
 
         for r in rem:
