@@ -1,8 +1,5 @@
 """
     * Bump Stalatites con Neat, (Redes neuronales)
-    Creado por: 
-    Brandon Palacio Alvarez
-    Andres Gaitan Jimenez
 """
 
 # * Declaración de librerías
