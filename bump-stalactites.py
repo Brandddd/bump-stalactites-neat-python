@@ -1,5 +1,8 @@
 """
     * Bump Stalatites con Neat, (Redes neuronales)
+    Creado por: 
+    Brandon Palacio Alvarez
+    Andres Gaitan Jimenez
 """
 
 # * Declaración de librerías
@@ -35,6 +38,73 @@ base_img = pygame.transform.scale2x(pygame.image.load(
 gen = 0
 
 # * Clase donde se declara la nave
+
+class Pipe():
+    """
+        * Clase Pipe: 
+        * Objeto tipo Pipa o estalactita. 
+    """
+    GAP = 200
+    VEL = 5
+
+    def __init__(self, x):
+        """
+            * Inicialización del objeto
+        """
+        self.x = x
+        self.height = 0
+
+        self.top = 0
+        self.bottom = 0
+
+        self.PIPE_TOP = pygame.transform.flip(pipe_img, False, True)
+        self.PIPE_BOTTOM = pipe_img
+
+        self.passed = False
+
+        self.set_height()
+
+    def set_height(self):
+        """
+            * Esta función, establece la altura de la Estalactita desde la parte más abajo de la pantalla
+        """
+        self.height = random.randrange(50, 450)
+        self.top = self.height - self.PIPE_TOP.get_height()
+        self.bottom = self.height + self.GAP
+
+    def move(self):
+        """
+            * Mueve la Estalactita en función de la velocidad. 
+            TODO : Incluir nivel de mas velocidad acorde a la puntuación.
+        """
+        self.x -= self.VEL * 1.5
+
+    def draw(self, win):
+        """
+            * Dibuja la parte de arriba y de abajo de la Estalactita
+        """
+        # Dibuja pipa de arriba.
+        win.blit(self.PIPE_TOP, (self.x, self.top))
+        # Dibuja pipa de abajo.
+        win.blit(self.PIPE_BOTTOM, (self.x, self.bottom))
+
+    def collide(self, bird, win):
+        """
+            * Función de colisión.
+        """
+        bird_mask = bird.get_mask()
+        top_mask = pygame.mask.from_surface(self.PIPE_TOP)
+        bottom_mask = pygame.mask.from_surface(self.PIPE_BOTTOM)
+        top_offset = (self.x - bird.x, self.top - round(bird.y))
+        bottom_offset = (self.x - bird.x, self.bottom - round(bird.y))
+
+        b_point = bird_mask.overlap(bottom_mask, bottom_offset)
+        t_point = bird_mask.overlap(top_mask, top_offset)
+
+        if b_point or t_point:
+            return True
+
+        return False
 
 
 class Bird:
@@ -108,74 +178,6 @@ class Bird:
         return pygame.mask.from_surface(self.img)
 
 
-class Pipe():
-    """
-        * Clase Pipe: 
-        * Objeto tipo Pipa o estalactita. 
-    """
-    GAP = 200
-    VEL = 5
-
-    def __init__(self, x):
-        """
-            * Inicialización del objeto
-        """
-        self.x = x
-        self.height = 0
-
-        self.top = 0
-        self.bottom = 0
-
-        self.PIPE_TOP = pygame.transform.flip(pipe_img, False, True)
-        self.PIPE_BOTTOM = pipe_img
-
-        self.passed = False
-
-        self.set_height()
-
-    def set_height(self):
-        """
-            * Esta función, establece la altura de la Estalactita desde la parte más abajo de la pantalla
-        """
-        self.height = random.randrange(50, 450)
-        self.top = self.height - self.PIPE_TOP.get_height()
-        self.bottom = self.height + self.GAP
-
-    def move(self):
-        """
-            * Mueve la Estalactita en función de la velocidad. 
-            TODO : Incluir nivel de mas velocidad acorde a la puntuación.
-        """
-        self.x -= self.VEL * 1.5
-
-    def draw(self, win):
-        """
-            * Dibuja la parte de arriba y de abajo de la Estalactita
-        """
-        # Dibuja pipa de arriba.
-        win.blit(self.PIPE_TOP, (self.x, self.top))
-        # Dibuja pipa de abajo.
-        win.blit(self.PIPE_BOTTOM, (self.x, self.bottom))
-
-    def collide(self, bird, win):
-        """
-            * Función de colisión.
-        """
-        bird_mask = bird.get_mask()
-        top_mask = pygame.mask.from_surface(self.PIPE_TOP)
-        bottom_mask = pygame.mask.from_surface(self.PIPE_BOTTOM)
-        top_offset = (self.x - bird.x, self.top - round(bird.y))
-        bottom_offset = (self.x - bird.x, self.bottom - round(bird.y))
-
-        b_point = bird_mask.overlap(bottom_mask, bottom_offset)
-        t_point = bird_mask.overlap(top_mask, top_offset)
-
-        if b_point or t_point:
-            return True
-
-        return False
-
-
 class Base:
     """
         * Representa el movimiento de la base de abajo (Especie de superficie marciana)
@@ -236,7 +238,7 @@ def draw_window(win, birds, pipes, base, score, gen, pipe_ind):
 
     base.draw(win)
     for bird in birds:
-        # ? 
+        # ?
         if DRAW_LINES:
             try:
                 pygame.draw.line(win, (255, 0, 0), (bird.x+bird.img.get_width()/2, bird.y + bird.img.get_height(
@@ -245,19 +247,19 @@ def draw_window(win, birds, pipes, base, score, gen, pipe_ind):
                 )/2), (pipes[pipe_ind].x + pipes[pipe_ind].PIPE_BOTTOM.get_width()/2, pipes[pipe_ind].bottom), 5)
             except:
                 pass
-        # * Dibuja la hb de la nave en pantalla. 
+        # * Dibuja la hb de la nave en pantalla.
         bird.draw(win)
 
     # * Texto generaciones
     score_label = STAT_FONT.render("Generación: " + str(gen), 1, (0, 0, 0))
     win.blit(score_label, (10, 10))
 
-    # * Texto de los que aun quedan vivos. 
+    # * Texto de los que aun quedan vivos.
     score_label = STAT_FONT.render(
         "Sobrevivientes: " + str(len(birds)), 1, (0, 0, 0))
     win.blit(score_label, (10, 50))
 
-    # * Puntuación 
+    # * Puntuación
     score_label = STAT_FONT.render("Puntaje: " + str(score), 1, (0, 0, 0))
     win.blit(score_label, (10, 90))
 
@@ -273,14 +275,14 @@ def eval_genomes(genomes, config):
     win = WIN
     gen += 1
 
-    # start by creating lists holding the genome itself, the
-    # neural network associated with the genome and the
-    # bird object that uses that network to play
+    # * Inicia con crear listas que contengan su genoma,
+    # * la red neuronal asociada con el genoma y
+    # * El objeto de tipo nave que usa la red para jugar.
     nets = []
     birds = []
     ge = []
     for genome_id, genome in genomes:
-        genome.fitness = 0  # start with fitness level of 0
+        genome.fitness = 0  # Inicia con un Fitness de 0
         net = neat.nn.FeedForwardNetwork.create(genome, config)
         nets.append(net)
         birds.append(Bird(230, 350))
@@ -304,21 +306,21 @@ def eval_genomes(genomes, config):
 
         pipe_ind = 0
         if len(birds) > 0:
-            # determine whether to use the first or second
+            # Determina cual usar, ya sea el primero o el segundo
             if len(pipes) > 1 and birds[0].x > pipes[0].x + pipes[0].PIPE_TOP.get_width():
-                # pipe on the screen for neural network input
+                # Estalactita en la pantalla para la entrada input de la red neuronal
                 pipe_ind = 1
-
-        # give each bird a fitness of 0.1 for each frame it stays alive
+        # * Le damos a cada nave un Fitness de 0.1 por cada que atraviese el obstaculo
         for x, bird in enumerate(birds):
             ge[x].fitness += 0.1
             bird.move()
 
-            # send bird location, top pipe location and bottom pipe location and determine from network whether to jump or not
+            # Envía la posición de la nave, la de la estalactita de arriba y la de abajo y determina desde la red neuronal
+            # Sí saltar o no saltar.
             output = nets[birds.index(bird)].activate((bird.y, abs(
                 bird.y - pipes[pipe_ind].height), abs(bird.y - pipes[pipe_ind].bottom)))
 
-            # we use a tanh activation function so result will be between -1 and 1. if over 0.5 jump
+            # Se utiliza una funcion de activacion tanh, así, el resultado será entre -1 y 1. Si es mayor que 0.5, este saltará.
             if output[0] > 0.5:
                 bird.jump()
 
@@ -328,7 +330,7 @@ def eval_genomes(genomes, config):
         add_pipe = False
         for pipe in pipes:
             pipe.move()
-            # check for collision
+            # Verifica si hay colisión
             for bird in birds:
                 if pipe.collide(bird, win):
                     ge[birds.index(bird)].fitness -= 1
@@ -345,9 +347,9 @@ def eval_genomes(genomes, config):
 
         if add_pipe:
             score += 1
-            # can add this line to give more reward for passing through a pipe (not required)
+            # Esta linea dará más y más recompensa al pasar mediante los obstaculos.
             for genome in ge:
-                genome.fitness += 5
+                genome.fitness += 2
             pipes.append(Pipe(WIN_WIDTH))
 
         for r in rem:
@@ -361,42 +363,39 @@ def eval_genomes(genomes, config):
 
         draw_window(WIN, birds, pipes, base, score, gen, pipe_ind)
 
-        # break if score gets large enough
-        if score > 200:
+        # Esta linea, rompe el programa si este supera el tope máximo de puntos.
+        if score > 100:
             print(" Felicidades, ha aprendido satisfactoriamente. ")
             break
 
 
 def run(config_file):
     """
-    runs the NEAT algorithm to train a neural network to play flappy bird.
-    :param config_file: location of config file
-    :return: None
+        * Ejecuta la librería NEAT con su respectiva config-file
     """
     config = neat.config.Config(neat.DefaultGenome, neat.DefaultReproduction,
                                 neat.DefaultSpeciesSet, neat.DefaultStagnation,
                                 config_file)
 
-    # Create the population, which is the top-level object for a NEAT run.
+    # Creación de la población que se usará para el aprendizaje
     p = neat.Population(config)
 
-    # Add a stdout reporter to show progress in the terminal.
+    # Estas lineas, muestran información por la terminal de diferentes aspectos del algoritmo
     p.add_reporter(neat.StdOutReporter(True))
     stats = neat.StatisticsReporter()
     p.add_reporter(stats)
     # p.add_reporter(neat.Checkpointer(5))
 
-    # Run for up to 50 generations.
-    winner = p.run(eval_genomes, 12)
+    # Ejecuta hasta 50 generaciones
+    winner = p.run(eval_genomes, 50)
 
-    # show final stats
-    print('\nBest genome:\n{!s}'.format(winner))
+    # Muestra los resultados Finales
+    print('\n Mejor genoma:\n{!s}'.format(winner))
 
 
 if __name__ == '__main__':
-    # Determine path to configuration file. This path manipulation is
-    # here so that the script will run successfully regardless of the
-    # current working directory.
+
+    # * Aquí se determina la dirección del archivo de configuración
     local_dir = os.path.dirname(__file__)
     config_path = os.path.join(local_dir, 'config-feedforward.txt')
     run(config_path)
